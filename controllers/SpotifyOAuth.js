@@ -38,9 +38,9 @@ exports.callback = async (req, res) => {
   // your application requests refresh and access tokens
   // after checking the state parameter
 
-  var code = req.query.code || null;
-  var state = req.query.state || null;
-  var storedState = req.cookies ? req.cookies[stateKey] : null;
+  const code = req.query.code || null;
+  const state = req.query.state || null;
+  const storedState = req.cookies ? req.cookies[stateKey] : null;
 
   if (state === null || state !== storedState) {
     res.redirect('/#' +
@@ -49,7 +49,7 @@ exports.callback = async (req, res) => {
       }));
   } else {
     res.clearCookie(stateKey);
-    var authOptions = {
+    const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code: code,
@@ -65,10 +65,10 @@ exports.callback = async (req, res) => {
     request.post(authOptions, function (error, response, body) {
       if (!error && response.statusCode === 200) {
 
-        var access_token = body.access_token,
+        const access_token = body.access_token,
           refresh_token = body.refresh_token;
 
-        var options = {
+        const options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { 'Authorization': 'Bearer ' + access_token },
           json: true
@@ -101,8 +101,8 @@ exports.callback = async (req, res) => {
 exports.refresh_token = async (req, res) => {
 
   // requesting access token from refresh token
-  var refresh_token = req.query.refresh_token;
-  var authOptions = {
+  const refresh_token = req.query.refresh_token;
+  const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
     form: {
@@ -114,7 +114,7 @@ exports.refresh_token = async (req, res) => {
 
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      var access_token = body.access_token;
+      const access_token = body.access_token;
       res.cookie('token', access_token).send({
         'access_token': access_token
       });
