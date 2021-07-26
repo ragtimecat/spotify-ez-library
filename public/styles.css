@@ -1,0 +1,30 @@
+a {
+  text-decoration: none;
+}
+
+.tracks-list {
+  display: none;
+}
+
+.player-controls {
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  padding: 5px 5px;
+  border-radius: 5px;
+  background-color: black;
+}
+
+.player-controls button {
+  cursor: pointer;
+}
+
+.navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  justify-content: space-evenly;
+  max-width: 300px;
+  margin: auto;
+  cursor: pointer;
+}

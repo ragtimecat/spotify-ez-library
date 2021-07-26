@@ -1,0 +1,42 @@
+<body>
+  <div class="content">
+
+    <div>Hello transfer is here</div>
+    <p>first row</p>
+    <form action="POST" id="album-save-form">
+      <input type="text" name="album-id" id="album-id">
+      <input type="submit" value="Submit">
+    </form>
+
+    <table style="width:100%">
+      <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>artist</th>
+      </tr>
+      <% transferData.forEach(el => { %>
+        <tr>
+          <td><%= el.id %></td>
+          <td><%= el.name %></td>
+          <td><%= el.artists[0] %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+</body>
+
+<script>
+  document.querySelector('#album-save-form').addEventListener('submit', el => {
+    el.preventDefault();
+    const albumId = document.querySelector('#album-id').value;
+    fetch('/add-single-album', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'Application/json'
+      },
+      body: JSON.stringify({
+        albumId
+      })
+    });
+  })
+</script>

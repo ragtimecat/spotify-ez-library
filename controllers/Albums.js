@@ -5,10 +5,12 @@ const fetch = require('node-fetch');
 // @access Private
 exports.albums = async (req, res) => {
   const access_token = req.cookies.token;
+  console.log(req.query.offset);
 
-  const limit = 2;
+  const offset = req.query.offset || 0;
+  const limit = 5;
 
-  let response = await fetch(`https://api.spotify.com/v1/me/albums?limit=${limit}`, {
+  let response = await fetch(`https://api.spotify.com/v1/me/albums?limit=${limit}&offset=${offset}`, {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${access_token}` }
   });
@@ -17,6 +19,11 @@ exports.albums = async (req, res) => {
 
   const albums = await response.json();
 
+  console.log(albums);
+
+  const pages_count = albums.total/limit;
+
+  
   let names = [];
   albums.items.forEach(el => {
     let tracks = [];
@@ -27,9 +34,11 @@ exports.albums = async (req, res) => {
       artist: el.album.artists[0].name,
       name: el.album.name,
       picture: el.album.images[2].url,
-      tracks: tracks
+      tracks: tracks,
+      link: el.album.external_urls.spotify
     });
   });
+
 
   // <----Get ALL albums in library -->
 
@@ -52,6 +61,6 @@ exports.albums = async (req, res) => {
 
 
   // res.send(albums);
-  res.render('pages/about', { names, access_token });
+  res.render('pages/about', { names, access_token, pages_count, limit });
 }
 

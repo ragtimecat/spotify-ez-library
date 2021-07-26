@@ -20,6 +20,7 @@ const generateRandomString = require('./utils/generateRandomString');
 //import routes
 const spotifyOAuth = require('./routes/SpotifyOAuth');
 const albums = require('./routes/Albums');
+const transfer = require('./routes/LibraryTransfer');
 
 // setting up env 
 dotenv.config({ path: './config/.env' });
@@ -49,7 +50,10 @@ if (process.env.NODE_ENV === 'development') {
 };
 
 //setting public folder
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public/'));
+
+//body parser from requests
+app.use(express.json());
 
 
 
@@ -208,6 +212,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(spotifyOAuth);
 app.use(albums);
+app.use(transfer);
 
 const PORT = process.env.PORT || 5000;
 
