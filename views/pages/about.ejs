@@ -44,7 +44,7 @@
           </p>
           <div class="tracks">
             Tracks:
-            <ul class="tracks-list">
+            <ul class="tracks-list" style="display: none">
               <% album.tracks.forEach(track=> { %>
                 <li>
                   <p data-id="<%= track.id %>" class="track" style="cursor: pointer">
@@ -183,7 +183,12 @@
     document.querySelectorAll('.tracks').forEach(el => el.addEventListener('click', e => {
       console.log('klek');
       // e.style.display = 'block';
-      console.log(e.children);
+      console.log(e.target.children[0].style.display);
+      if (e.target.children[0].style.display == 'none') {
+        e.target.children[0].style.display = 'block';
+      } else {
+        e.target.children[0].style.display = 'none';
+      }
     }))
     
     

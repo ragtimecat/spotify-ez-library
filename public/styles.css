@@ -2,8 +2,9 @@ a {
   text-decoration: none;
 }
 
-.tracks-list {
-  display: none;
+.tracks {
+  cursor: pointer;
+  margin-bottom: 5px;
 }
 
 .player-controls {
@@ -27,4 +28,22 @@ a {
   max-width: 300px;
   margin: auto;
   cursor: pointer;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: auto;
+  padding-top: 40px;
+}
+
+.token-loading-error {
+  display: none;
+  font-size: 14px;
+  color: red;
+}
+
+.host-content {
+  max-width: 70%;
 }

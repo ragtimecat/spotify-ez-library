@@ -1,31 +1,68 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transfer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <body>
   <div class="content">
+    <div class="container">
+      <div class="host-content">
+        <p>You are logged as <%= userData.name %></p>
+        <p>email: <%= userData.email %></p>
+        <p>You have <%= transferData.length %> albums in library</p>
+        <p>add new album</p>
+        <form action="POST" id="album-save-form">
+          <input type="text" name="album-id" id="album-id">
+          <input type="submit" value="Submit">
+        </form>
 
-    <div>Hello transfer is here</div>
-    <p>first row</p>
-    <form action="POST" id="album-save-form">
-      <input type="text" name="album-id" id="album-id">
-      <input type="submit" value="Submit">
-    </form>
+        <table style="width:40%">
+          <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>artist</th>
+          </tr>
+          <% transferData.forEach(el => { %>
+            <tr>
+              <td><%= el.id %></td>
+              <td><%= el.name %></td>
+              <td><%= el.artists[0] %></td>
+            </tr>
+          <% }) %>
+        </table>
+      </div>
+      <div class="recipient-content">
+        <p>You are logged as: <span class="recipient-name"></span></p>
+        <p>email: <span class="recipient-email"></span></p>
+        <p>Insert access token</p>
+        <form action="POST" id="access-token-id">
+          <input type="text" id="access-token-value">
+          <input type="submit" value="Save Token">
+        </form>
+        <p>load user's library</p>
+        <p class="token-loading-error"></p>
+        <button class="load-user-lib">Load</button>
+        <p>Transfer albums</p>
+        <button class="transfer-albums-btn">Transfer</button>
+      </div>
+    </div>
 
-    <table style="width:100%">
-      <tr>
-        <th>id</th>
-        <th>name</th>
-        <th>artist</th>
-      </tr>
-      <% transferData.forEach(el => { %>
-        <tr>
-          <td><%= el.id %></td>
-          <td><%= el.name %></td>
-          <td><%= el.artists[0] %></td>
-        </tr>
-      <% }) %>
-    </table>
+    
   </div>
 </body>
 
 <script>
+  window.onload = async () => {
+    const token = getRecipientCookie();
+    if(!token) {
+      console.log('no token');
+      return;
+    }
+    document.querySelector('#access-token-value').value = token;
+    loadRecipient(token);
+
+  }
   document.querySelector('#album-save-form').addEventListener('submit', el => {
     el.preventDefault();
     const albumId = document.querySelector('#album-id').value;
@@ -39,4 +76,82 @@
       })
     });
   })
+  document.querySelector('#access-token-id').addEventListener('submit', el => {
+    el.preventDefault();
+    const recipientToken = document.querySelector('#access-token-value').value;
+    document.cookie=`recipientToken=${recipientToken};path=/;`
+    loadRecipient(recipientToken);
+  })
+
+  document.querySelector('.load-user-lib').addEventListener('click',async el => {
+    // splitting all cookie string to dictinct cookies, than filter through to find one with the right name
+    // and then cutting text, so we get a clean token
+    const recipientAccessToken = getRecipientCookie();
+    //visual error handling when token is not present
+    if (!recipientAccessToken) {
+      console.log('no token');
+      noTokenErrorShow();
+      return;
+    }
+    // let response = await fetch(`https://api.spotify.com/v1/me/albums?limit=10`, {
+    //   method: 'GET',
+    //   headers: { 'Authorization': `Bearer ${recipientAccessToken}` }
+    // });
+
+    // const albums = await response.json();
+    // console.log(albums);
+  })
+
+  document.querySelector('.transfer-albums-btn').addEventListener('click', el => {
+    const token = getRecipientCookie();
+    if (!token) {
+      console.log('no token');
+      noTokenErrorShow();
+      return;
+    }
+    fetch('/transfer-albums-to-recipient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        access_token: token
+      })
+    })
+  })
+
+  const getRecipientCookie = () => {
+    const cookie = document.cookie.split(';')
+      .filter(el => el.includes('recipientToken='))[0];
+    if(!cookie) {
+      return false;
+    }
+    return cookie.replace('recipientToken=','');
+  }
+
+  const loadRecipient = async (token) => {
+    const response = await fetch('/get-user-data', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token
+      })
+    })
+    const parsedResp = await response.json();
+
+    document.querySelector('.recipient-name').innerHTML = parsedResp.data.name;
+    document.querySelector('.recipient-email').innerHTML = parsedResp.data.email;
+  }
+
+  const noTokenErrorShow = () => {
+    const errorText = document.querySelector('.token-loading-error');
+      errorText.style.display = 'block';
+      errorText.innerText = 'Please enter the token';
+      setTimeout(() => {
+        errorText.style.display = 'none';
+      }, 5000)
+  }
 </script>
