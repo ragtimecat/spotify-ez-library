@@ -10,7 +10,8 @@
       <div class="host-content">
         <p>You are logged as <%= userData.name %></p>
         <p>email: <%= userData.email %></p>
-        <p>You have <%= transferData.length %> albums in library</p>
+        <p>You have <%= numberOfAlbums %> albums in library</p>
+        <p>You have <%= transferData.length %> albums loaded</p>
         <p>add new album</p>
         <form action="POST" id="album-save-form">
           <input type="text" name="album-id" id="album-id">

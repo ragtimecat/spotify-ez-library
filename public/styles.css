@@ -2,9 +2,27 @@ a {
   text-decoration: none;
 }
 
-.tracks {
+footer {
+  height: 100px;
+}
+
+footer p {
+  padding-top: 80px;
+  text-align: center;
+}
+
+.album-tracks {
   cursor: pointer;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
+  margin-left: 70px;
+}
+
+.album-info {
+  display: flex;
+}
+
+.album-info img {
+  margin-right: 5px;
 }
 
 .player-controls {

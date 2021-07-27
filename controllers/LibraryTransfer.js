@@ -1,4 +1,8 @@
 const fetch = require('node-fetch');
+const {
+  getAlbums
+} = require('../utils/services');
+
 
 let transferAlbumsDataSave = [];
 
@@ -7,12 +11,14 @@ let transferAlbumsDataSave = [];
 // @access Private
 exports.transfer = async (req, res) => {
   const access_token = req.cookies.token;
-  const transferData = await getAllAlbums(access_token);
+  const limit = 5;
+
+  const { resultingArray: transferData, numberOfAlbums } = await getAlbums(access_token, limit, false, 'transfer_data');
+
   transferAlbumsDataSave = transferData;
   const userData = await getUserData(access_token);
   // dbConnection(transferData);
-  // console.log('transfer data in memory');
-  res.render('pages/transfer', { transferData, userData });
+  res.render('pages/transfer', { transferData, userData, numberOfAlbums });
 }
 
 exports.transferAlbumsToRecipient = async (req, res) => {
@@ -112,54 +118,7 @@ exports.recipientsAlbums = async (req, res) => {
 }
 
 
-// @desc Utility method/Get all user's ablums for transfering purposes
-const getAllAlbums = async (access_token) => {
-  let response = await fetch(`https://api.spotify.com/v1/me/albums?limit=50`, {
-    method: 'GET',
-    headers: { 'Authorization': `Bearer ${access_token}` }
-  });
 
-  const albums = await response.json();
-  
-  let transfer_array = [];
-  albums.items.forEach(el => {
-    const artists = [];
-    el.album.artists.forEach(artist => {
-      artists.push(artist.name);
-    })
-    transfer_array.push({ 
-      id: el.album.id,
-      name: el.album.name,
-      artists,
-      })
-  })
-
-  // let lastResult = albums;
-  // do {
-  //   response = await fetch(lastResult.next, {
-  //     method: 'GET',
-  //     headers: { 'Authorization': `Bearer ${access_token}` }
-  //   });
-
-  //   const data = await response.json();
-
-  //   data.items.forEach(el => {
-  //     const artists = [];
-  //     el.album.artists.forEach(artist => {
-  //       artists.push(artist.name);
-  //     })
-  //     transfer_array.push({ 
-  //       id: el.album.id,
-  //       name: el.album.name,
-  //       artists
-  //       })
-  //   })
-
-  //   lastResult = data;
-  // } while (lastResult.next !== null)
-
-  return transfer_array;
-}
 
 
 // @desc Get User Data
