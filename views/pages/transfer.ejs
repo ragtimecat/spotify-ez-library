@@ -9,7 +9,7 @@
     <div class="container">
       <div class="host-content">
         <p>You are logged as <%= userData.name %></p>
-        <p>email: <%= userData.email %></p>
+        <p>id: <%= userData.id %></p>
         <p>You have <%= numberOfAlbums %> albums in library</p>
         <p>You have <%= transferData.length %> albums loaded</p>
         <p>add new album</p>
@@ -36,7 +36,7 @@
       </div>
       <div class="recipient-content">
         <p>You are logged as: <span class="recipient-name"></span></p>
-        <p>email: <span class="recipient-email"></span></p>
+        <p>id: <span class="recipient-id"></span></p>
         <p>Insert access token</p>
         <form action="POST" id="access-token-id">
           <input type="text" id="access-token-value">
@@ -169,7 +169,7 @@
     const parsedResp = await response.json();
 
     document.querySelector('.recipient-name').innerHTML = parsedResp.data.name;
-    document.querySelector('.recipient-email').innerHTML = parsedResp.data.email;
+    document.querySelector('.recipient-id').innerHTML = parsedResp.data.id;
   }
 
   const noTokenErrorShow = () => {

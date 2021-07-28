@@ -18,6 +18,9 @@
 </head>
 
 <body>
+  <% if (noAlbums) { %>
+  <p>No data</p>
+  <% } else { %>
   <div class="content">
     <div class="navigation">
       <ul>
@@ -60,6 +63,7 @@
         <% }) %>
     </ul>
   </div>
+  <% } %>
   <footer>
     <p>
       footer

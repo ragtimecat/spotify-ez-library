@@ -88,7 +88,10 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
 }
 
 
-
+// @ desc Save individual album to user's library
+// @params
+// access_token String - oauth spotify token
+// albumId String - spotify's id of album to add
 exports.addSingleAlbum = async (access_token, albumId) => {
   try {
     const response = await fetch(`https://api.spotify.com/v1/me/albums`, {
@@ -106,6 +109,23 @@ exports.addSingleAlbum = async (access_token, albumId) => {
   } catch (e) {
     console.log(e);
   }
+}
+
+// @ desc Get user's name and id
+// @params
+// access_token String - oauth spotify token
+exports.getUserData = async (access_token) => {
+  const response = await fetch('https://api.spotify.com/v1/me', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${access_token}`
+    }
+  });
+  const parsedResponse = await response.json();
+  return { 
+    name: parsedResponse.display_name,
+    id: parsedResponse.id
+  };
 }
 
 
@@ -146,4 +166,6 @@ const prepareDataForLibraryListing = (albums) => {
 
   return libraryChunk;
 }
+
+
 
