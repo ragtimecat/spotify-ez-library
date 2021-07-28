@@ -29,6 +29,7 @@
               <td><%= el.id %></td>
               <td><%= el.name %></td>
               <td><%= el.artists[0] %></td>
+              <td><button class="save-album-btn" album-id="<%= el.id %>">Transfer</button></td>
             </tr>
           <% }) %>
         </table>
@@ -67,7 +68,7 @@
   document.querySelector('#album-save-form').addEventListener('submit', el => {
     el.preventDefault();
     const albumId = document.querySelector('#album-id').value;
-    fetch('/add-single-album', {
+    fetch('/save-single-album', {
       method: 'POST',
       headers: {
         'Content-Type': 'Application/json'
@@ -121,6 +122,30 @@
     })
   })
 
+  document.querySelectorAll('.save-album-btn').forEach(el => el.addEventListener('click', async e => {
+    const albumId = e.target.getAttribute('album-id');
+    const access_token = getRecipientCookie();
+    if (!access_token) {
+      console.log('no token');
+      noTokenErrorShow();
+      return;
+    }
+    await fetch('/save-single-album', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'Application/json'
+      },
+      body: JSON.stringify({
+        albumId,
+        access_token
+      })
+    });
+  }))
+
+  document.querySelector('.token-loading-error').addEventListener('click', el => {
+    el.target.style.display = 'none';
+  })
+
   const getRecipientCookie = () => {
     const cookie = document.cookie.split(';')
       .filter(el => el.includes('recipientToken='))[0];
@@ -151,8 +176,5 @@
     const errorText = document.querySelector('.token-loading-error');
       errorText.style.display = 'block';
       errorText.innerText = 'Please enter the token';
-      setTimeout(() => {
-        errorText.style.display = 'none';
-      }, 5000)
   }
 </script>

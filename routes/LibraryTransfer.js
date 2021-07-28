@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   transfer,
-  addSingleAlbum,
+  saveSingleAlbum,
   recipientsAlbums,
   getUserData,
   transferAlbumsToRecipient
@@ -11,7 +11,7 @@ const router = express.Router();
 
 // transfer user's ablums to another acc
 router.get('/transfer', transfer);
-router.post('/add-single-album', addSingleAlbum);
+router.post('/save-single-album', saveSingleAlbum);
 router.post('/recipient-albums', recipientsAlbums);
 router.post('/get-user-data', getUserData);
 router.post('/transfer-albums-to-recipient', transferAlbumsToRecipient);

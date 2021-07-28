@@ -43,7 +43,7 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
       break;
     }
     case 'all_data': {
-      resultingArray = albums;
+      resultingArray = albums.items;
       break;
     }
     default: {
@@ -71,7 +71,7 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
           break;
         }
         case 'all_data': {
-          resultingArray = resultingArray.concat(data);
+          resultingArray = resultingArray.concat(data.items);
           break;
         }
         default: {
@@ -86,6 +86,28 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
     numberOfAlbums
   };
 }
+
+
+
+exports.addSingleAlbum = async (access_token, albumId) => {
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/me/albums`, {
+      method: 'PUT',
+      headers: { 
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        ids: [albumId]
+      })
+
+    })
+    return response.status;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 
 // rearranging albums array from request in preparation for transfering
 const prepareDataForTransfer = (albums) => {
@@ -124,3 +146,4 @@ const prepareDataForLibraryListing = (albums) => {
 
   return libraryChunk;
 }
+

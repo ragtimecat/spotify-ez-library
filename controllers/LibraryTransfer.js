@@ -1,6 +1,8 @@
+const { response } = require('express');
 const fetch = require('node-fetch');
 const {
-  getAlbums
+  getAlbums,
+  addSingleAlbum
 } = require('../utils/services');
 
 
@@ -13,12 +15,15 @@ exports.transfer = async (req, res) => {
   const access_token = req.cookies.token;
   const limit = 5;
 
+  // Options: transfer_data, library_listing_data, all_data
   const { resultingArray: transferData, numberOfAlbums } = await getAlbums(access_token, limit, false, 'transfer_data');
 
+  console.log(transferData);
   transferAlbumsDataSave = transferData;
   const userData = await getUserData(access_token);
   // dbConnection(transferData);
   res.render('pages/transfer', { transferData, userData, numberOfAlbums });
+  // res.send('hello');
 }
 
 exports.transferAlbumsToRecipient = async (req, res) => {
@@ -74,34 +79,25 @@ exports.transferAlbumsToRecipient = async (req, res) => {
   })
 }
 
-// @desc Add single album by id
-// @route GET /add-single-album
+// @desc Save single album by id
+// @route POST /save-single-album
 // @access Private
-exports.addSingleAlbum = async (req, res) => {
-  const access_token = req.cookies.token;
-
-  try {
-    const response = await fetch(`https://api.spotify.com/v1/me/albums`, {
-      method: 'PUT',
-      headers: { 
-        'Authorization': `Bearer ${access_token}`,
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({
-        ids: [req.body.albumId]
-      })
-
-    });
-    console.log(response);
-  } catch (e) {
-    console.log(e);
+exports.saveSingleAlbum = async (req, res) => {
+  // if access_token not present, then it defaults to host/donor token 
+  const { albumId, access_token = req.cookies.token } = req.body;
+  
+  const responseStatus = await addSingleAlbum(access_token, albumId);
+  if (responseStatus === 200) {
+    res.status(200).json({
+      succes: true,
+      data: {}
+    })
+  } else {
+    res.status(500).json({
+      succes: false,
+      data: { message: 'something went wrong' }
+    })
   }
-
-
-  res.status(200).json({
-    success: true,
-    data: {}
-  })
 }
 
 // @desc Get Recipient User's Albums
@@ -116,10 +112,6 @@ exports.recipientsAlbums = async (req, res) => {
   //   data: albums
   // })
 }
-
-
-
-
 
 // @desc Get User Data
 // @route POST /get-user-data
