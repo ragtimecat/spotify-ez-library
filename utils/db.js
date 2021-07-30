@@ -4,16 +4,24 @@ const connectionString = process.env.DB_CONNECT;
     connectionString
   })
 
+exports.syncLoadedAlbumsWithDB = async (loadedData) => {
+  // insertAlbums(loadedData.albums);
+  console.log(loadedData.tracks);
+  insertTracks(loadedData.tracks);
+}
+
+exports.getAllAlbumsFromDB = async () => {
+  return await getAllAlbums();
+}
 
 exports.dbConnection = async (transferData) => {
   // const res = await getAllAlbums(pool);
   // console.log('albums');
   // console.log(res);
-  await truncateTable('albums');
+  // await truncateTable('albums');
   // await truncateTable('albums', pool);
   // await insertUserAlbums();
-  
-  pool.end();
+  // pool.end();
 }
 
 const getAllAlbums = async () => {
@@ -42,4 +50,44 @@ const insertUserAlbums = async (albums) => {
       console.log(err);
     }
   })  
+}
+
+const isnertQueryBuilder = (tableName, rowNames, data) => {
+  let insertQueryString = `INSERT INTO ${tableName} (`;
+  const preparedArray = [];
+  rowNames.forEach(name => {
+    insertQueryString += `${name}, `;
+  })
+  insertQueryString = insertQueryString.slice(0, -2) + ') VALUES (';
+
+  const rowLength = rowNames.length;
+
+  data.forEach((singleItem, index) => {
+    let singleItemIndex = 0;
+    for (const prop in singleItem) {
+      preparedArray.push(singleItem[prop])
+      insertQueryString += `$${index * rowLength + singleItemIndex + 1}, `;
+      singleItemIndex ++;
+    }
+    insertQueryString = insertQueryString.slice(0, -2) + '), (';
+  })
+  insertQueryString = insertQueryString.slice(0, -3) + ';';
+
+  return {
+    insertQueryString,
+    preparedArray
+  };
+}
+
+const insertTracks = async (loadedTracks) => {
+  const { insertQueryString, preparedArray } = isnertQueryBuilder('tracks', ['album_id', 'name', 'id'], loadedTracks);
+  // console.log(insertQueryString);
+  // console.log(preparedArray);
+  await pool.query(insertQueryString, preparedArray);
+}
+
+const insertAlbums = async (loadedAlbums) => {
+  const { insertQueryString, preparedArray } = isnertQueryBuilder('albums', 
+    ['id', 'artist', 'name', 'big_picture', 'small_picture', 'link'], loadedAlbums);
+  await pool.query(insertQueryString, preparedArray);
 }

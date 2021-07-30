@@ -30,20 +30,26 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
   
   const numberOfAlbums = albums.total;
   
-  let resultingArray = [];
+  let resultingData = [];
+  if (arrayShapeType === 'library_listing_data') {
+    resultingData = {
+      albums: [],
+      tracks: []
+    };
+  }
 
   //different formating options depending on param
   switch(arrayShapeType) {
     case 'transfer_data': {
-      resultingArray = prepareDataForTransfer(albums);
+      resultingData = prepareDataForTransfer(albums);
       break;
     }
     case 'library_listing_data': {
-      resultingArray = prepareDataForLibraryListing(albums);
+      resultingData = prepareDataForLibraryListing(albums);
       break;
     }
     case 'all_data': {
-      resultingArray = albums.items;
+      resultingData = albums.items;
       break;
     }
     default: {
@@ -63,15 +69,15 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
 
       switch(arrayShapeType) {
         case 'transfer_data': {
-          resultingArray = resultingArray.concat(prepareDataForTransfer(data));
+          resultingData = resultingData.concat(prepareDataForTransfer(data));
           break;
         }
         case 'library_listing_data': {
-          resultingArray = resultingArray.concat(prepareDataForLibraryListing(data));
+          resultingData = resultingData.concat(prepareDataForLibraryListing(data));
           break;
         }
         case 'all_data': {
-          resultingArray = resultingArray.concat(data.items);
+          resultingData = resultingData.concat(data.items);
           break;
         }
         default: {
@@ -82,7 +88,7 @@ exports.getAlbums = async (access_token, limit, isAll, arrayShapeType='all_data'
     } while (lastResult.next !== null)
   }
   return {
-    resultingArray,
+    resultingData,
     numberOfAlbums
   };
 }
@@ -150,21 +156,25 @@ const prepareDataForTransfer = (albums) => {
 
 const prepareDataForLibraryListing = (albums) => {
   let libraryChunk = [];
+  let tracks = [];
   albums.items.forEach(el => {
-    let tracks = [];
     el.album.tracks.items.forEach(track => {
-      tracks.push({ name: track.name, id: track.id });
+      tracks.push({ album_id: el.album.id,name: track.name, id: track.id });
     })
     libraryChunk.push({
+      id: el.album.id,
       artist: el.album.artists[0].name,
       name: el.album.name,
-      picture: el.album.images[2].url,
-      tracks: tracks,
+      big_picture: el.album.images[1].url,
+      small_picture: el.album.images[2].url,
       link: el.album.external_urls.spotify
     });
   });
 
-  return libraryChunk;
+  return { 
+    albums: libraryChunk,
+    tracks
+  }
 }
 
 

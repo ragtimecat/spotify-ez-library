@@ -20,7 +20,7 @@ exports.transfer = async (req, res) => {
   const limit = 5;
 
   // Options: transfer_data, library_listing_data, all_data
-  const { resultingArray: transferData, numberOfAlbums } = await getAlbums(access_token, limit, false, 'transfer_data');
+  const { resultingData: transferData, numberOfAlbums } = await getAlbums(access_token, limit, false, 'transfer_data');
 
   transferAlbumsDataSave = transferData;
 
