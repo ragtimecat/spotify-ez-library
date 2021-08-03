@@ -72,20 +72,12 @@ exports.callback = async (req, res) => {
           refresh_token = body.refresh_token;
 
         // we can also pass the token to the browser to make requests from there
-        res.cookie('token', access_token).redirect(
-          '/#' +
-            querystring.stringify({
-              access_token: access_token,
-              refresh_token: refresh_token,
-            })
-        );
+        res
+          .cookie('token', access_token)
+          .cookie('refresh_token', refresh_token)
+          .redirect('/#logged');
       } else {
-        res.redirect(
-          '/#' +
-            querystring.stringify({
-              error: 'invalid_token',
-            })
-        );
+        res.redirect('/#logged');
       }
     });
   }
