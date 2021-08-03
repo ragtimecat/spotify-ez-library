@@ -1,7 +1,5 @@
 const express = require('express');
-const {
-  albums
-} = require('../controllers/Albums');
+const { albums } = require('../controllers/Albums');
 
 const router = express.Router();
 

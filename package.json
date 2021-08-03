@@ -4,7 +4,11 @@
   "description": "Basic examples of the Spotify authorization flows through OAuth 2",
   "version": "0.0.2",
   "scripts": {
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "validate": "npm run lint && npm run check-format",
+    "lint": "eslint --ignore-path .gitignore .",
+    "check-format": "npm run prettier -- --check",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json)\""
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
@@ -18,5 +22,16 @@
     "pg": "^8.6.0",
     "querystring": "~0.2.0",
     "request": "~2.83.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "husky": "^7.0.0",
+    "prettier": "^2.3.2"
   }
 }

@@ -2,7 +2,7 @@ const express = require('express');
 const {
   login,
   callback,
-  refresh_token
+  refresh_token,
 } = require('../controllers/SpotifyOAuth');
 
 const router = express.Router();
