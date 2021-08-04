@@ -11,10 +11,11 @@ const dotenv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 
 const cookieParser = require('cookie-parser');
 
-//import routes
+// import routes
 const spotifyOAuth = require('./routes/SpotifyOAuth');
 const albums = require('./routes/Albums');
 const transfer = require('./routes/LibraryTransfer');
@@ -45,18 +46,19 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-//setting public folder
-app.use(express.static(__dirname + '/public/'));
+// setting public folder
+app.use(express.static(path.join(__dirname, 'public/')));
 
-//body parser from requests
+// body parser from requests
 app.use(express.json());
 
-//routes
+// routes
 app.use(spotifyOAuth);
 app.use(albums);
 app.use(transfer);
 
 const PORT = process.env.PORT || 5000;
 
+// eslint-disable-next-line no-console
 console.log(`Listening on ${PORT}`);
 app.listen(PORT);

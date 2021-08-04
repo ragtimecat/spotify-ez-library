@@ -11,10 +11,11 @@
     "no-unsafe-negation": "warn",
     "no-unused-vars": "warn",
     "no-unexpected-multiline": "warn",
-    "no-undef": "warn"
+    "no-undef": "warn",
+    "no-use-before-define": 0
   },
-  // "extends": ["airbnb", "prettier"],
-  "extends": ["eslint:recommended", "eslint-config-prettier"],
+  "extends": ["airbnb", "prettier"],
+  // "extends": ["eslint:recommended", "eslint-config-prettier"],
   "env": {
     "browser": true,
     "node": true,

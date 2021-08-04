@@ -7,12 +7,12 @@ let transferAlbumsDataSave = [];
 // @route GET /transfer
 // @access Private
 exports.transfer = async (req, res) => {
-  const access_token = req.cookies.token;
+  const accessToken = req.cookies.token;
   const limit = 5;
 
   // Options: transfer_data, library_listing_data, all_data
   const { resultingData: transferData, numberOfAlbums } = await getAlbums(
-    access_token,
+    accessToken,
     limit,
     false,
     'transfer_data'
@@ -20,7 +20,7 @@ exports.transfer = async (req, res) => {
 
   transferAlbumsDataSave = transferData;
 
-  const userData = await getUserData(access_token);
+  const userData = await getUserData(accessToken);
   res.render('pages/transfer', { transferData, userData, numberOfAlbums });
 };
 
@@ -29,28 +29,26 @@ exports.transferAlbumsToRecipient = async (req, res) => {
 
   const limit = 50;
 
-  if (transferAlbumsDataSave.length > limit) {
-    console.log('have to make it in cycle');
-  }
-
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < Math.ceil(transferAlbumsDataSave.length / limit); i++) {
-    let slice_border = '';
+    let sliceBorder = '';
     if (
       transferAlbumsDataSave.length - i * limit < limit &&
       transferAlbumsDataSave.length % limit < (i + 1) * limit
     ) {
-      slice_border = (transferAlbumsDataSave.length % limit) + i * limit;
+      sliceBorder = (transferAlbumsDataSave.length % limit) + i * limit;
     } else {
-      slice_border = (i + 1) * limit;
+      sliceBorder = (i + 1) * limit;
     }
-    const tempArray = transferAlbumsDataSave.slice(i * limit, slice_border);
+    const tempArray = transferAlbumsDataSave.slice(i * limit, sliceBorder);
 
-    let transferChunkArray = [];
+    const transferChunkArray = [];
     tempArray.forEach((el) => {
       transferChunkArray.push(el.id);
     });
 
     try {
+      // eslint-disable-next-line no-await-in-loop
       const response = await fetch(`https://api.spotify.com/v1/me/albums`, {
         method: 'PUT',
         headers: {
@@ -107,8 +105,8 @@ exports.saveSingleAlbum = async (req, res) => {
 // @route POST /get-user-data
 // @access Private
 exports.getUserData = async (req, res) => {
-  const access_token = req.body.token;
-  const data = await getUserData(access_token);
+  const accessToken = req.body.token;
+  const data = await getUserData(accessToken);
   res.status(200).json({
     success: true,
     data,

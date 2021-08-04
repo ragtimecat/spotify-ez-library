@@ -13,7 +13,7 @@ const fetch = require('node-fetch');
 // offset Int OPTIONAL - The index of the first object to return.
 // Default: 0 (i.e., the first object).
 exports.getAlbums = async (
-  access_token,
+  accessToken,
   limit,
   isAll,
   arrayShapeType = 'all_data',
@@ -29,7 +29,7 @@ exports.getAlbums = async (
 
   let response = await fetch(queryString, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${access_token}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   const albums = await response.json();
@@ -44,7 +44,7 @@ exports.getAlbums = async (
     };
   }
 
-  //different formating options depending on param
+  // different formating options depending on param
   switch (arrayShapeType) {
     case 'transfer_data': {
       resultingData = prepareDataForTransfer(albums);
@@ -66,11 +66,13 @@ exports.getAlbums = async (
   if (isAll) {
     let lastResult = albums;
     do {
+      // eslint-disable-next-line no-await-in-loop
       response = await fetch(lastResult.next, {
         method: 'GET',
-        headers: { Authorization: `Bearer ${access_token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
+      // eslint-disable-next-line no-await-in-loop
       const data = await response.json();
 
       switch (arrayShapeType) {
@@ -105,12 +107,12 @@ exports.getAlbums = async (
 // @params
 // access_token String - oauth spotify token
 // albumId String - spotify's id of album to add
-exports.addSingleAlbum = async (access_token, albumId) => {
+exports.addSingleAlbum = async (accessToken, albumId) => {
   try {
     const response = await fetch(`https://api.spotify.com/v1/me/albums`, {
       method: 'PUT',
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -120,17 +122,18 @@ exports.addSingleAlbum = async (access_token, albumId) => {
     return response.status;
   } catch (e) {
     console.log(e);
+    return e.message;
   }
 };
 
 // @ desc Get user's name and id
 // @params
 // access_token String - oauth spotify token
-exports.getUserData = async (access_token) => {
+exports.getUserData = async (accessToken) => {
   const response = await fetch('https://api.spotify.com/v1/me', {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${access_token}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
   const parsedResponse = await response.json();
@@ -142,7 +145,7 @@ exports.getUserData = async (access_token) => {
 
 // rearranging albums array from request in preparation for transfering
 const prepareDataForTransfer = (albums) => {
-  let transferChunk = [];
+  const transferChunk = [];
 
   albums.items.forEach((el) => {
     const artists = [];
@@ -162,8 +165,8 @@ const prepareDataForTransfer = (albums) => {
 // New version of function for complete database sync
 // eslint-disable-next-line no-unused-vars
 const prepareDataForLibraryListing = (albums) => {
-  let libraryChunk = [];
-  let tracks = [];
+  const libraryChunk = [];
+  const tracks = [];
   albums.items.forEach((el) => {
     el.album.tracks.items.forEach((track) => {
       tracks.push({ album_id: el.album.id, name: track.name, id: track.id });
@@ -187,9 +190,9 @@ const prepareDataForLibraryListing = (albums) => {
 // Old version of function used just for compatability with ejs template
 // Delete it when react frontend is ready
 const prepareDataForLibraryListingOld = (albums) => {
-  let libraryChunk = [];
+  const libraryChunk = [];
   albums.items.forEach((el) => {
-    let tracks = [];
+    const tracks = [];
     el.album.tracks.items.forEach((track) => {
       tracks.push({ name: track.name, id: track.id });
     });
@@ -197,7 +200,7 @@ const prepareDataForLibraryListingOld = (albums) => {
       artist: el.album.artists[0].name,
       name: el.album.name,
       picture: el.album.images[2].url,
-      tracks: tracks,
+      tracks,
       link: el.album.external_urls.spotify,
     });
   });

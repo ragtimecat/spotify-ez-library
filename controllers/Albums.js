@@ -6,17 +6,14 @@ const { syncLoadedAlbumsWithDB, getAllAlbumsFromDB } = require('../utils/db');
 // @route GET /albums
 // @access Private
 exports.albums = async (req, res) => {
-  const access_token = req.cookies.token;
+  const accessToken = req.cookies.token;
 
   const offset = req.query.offset || 0;
   const limit = 15;
 
-  // await dbConnection();
-
   // Options: transfer_data, library_listing_data, all_data
-  // eslint-disable-next-line no-unused-vars
   const { resultingData, numberOfAlbums } = await getAlbums(
-    access_token,
+    accessToken,
     limit,
     false,
     'library_listing_data',
@@ -27,14 +24,14 @@ exports.albums = async (req, res) => {
   // syncLoadedAlbumsWithDB(resultingData);
 
   // console.log(await getAllAlbumsFromDB());
-  // eslint-disable-next-line no-unused-vars
-  const pages_count = numberOfAlbums / limit;
+  const pagesCount = numberOfAlbums / limit;
   const albums = resultingData;
 
+  // await dbConnection();
   res.render('pages/albums', {
     albums,
-    access_token,
-    pages_count,
+    accessToken,
+    pagesCount,
     limit,
     noAlbums: false,
   });

@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+
 const connectionString = process.env.DB_CONNECT;
 const pool = new Pool({
   connectionString,
@@ -11,7 +12,8 @@ exports.syncLoadedAlbumsWithDB = async (loadedData) => {
 };
 
 exports.getAllAlbumsFromDB = async () => {
-  return await getAllAlbums();
+  const allAlbums = await getAllAlbums();
+  return allAlbums;
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -21,7 +23,7 @@ exports.dbConnection = async (transferData) => {
   // console.log(res);
   // await truncateTable('albums');
   // await truncateTable('albums', pool);
-  // await insertUserAlbums();
+  await insertAlbums(transferData);
   // pool.end();
 };
 
@@ -39,7 +41,7 @@ const truncateTable = async (tableName) => {
 const insertUserAlbums = async (albums) => {
   let insertQueryString = 'INSERT INTO albums (album_id, name, artist) VALUES';
 
-  let dataPreparedForQuery = [];
+  const dataPreparedForQuery = [];
   albums.forEach((el, index) => {
     insertQueryString += ` ($${index * 3 + 1}, $${index * 3 + 2}, $${
       index * 3 + 3
@@ -48,7 +50,8 @@ const insertUserAlbums = async (albums) => {
     dataPreparedForQuery.push(el.name);
     dataPreparedForQuery.push(el.artists[0]);
   });
-  insertQueryString = insertQueryString.slice(0, -1) + ';';
+  // insertQueryString = insertQueryString.slice(0, -1) + ';';
+  insertQueryString = `${insertQueryString.slice(0, -1)};`;
 
   // eslint-disable-next-line no-unused-vars
   pool.query(insertQueryString, dataPreparedForQuery, (err, res) => {
@@ -58,26 +61,28 @@ const insertUserAlbums = async (albums) => {
   });
 };
 
-const isnertQueryBuilder = (tableName, rowNames, data) => {
+const insertQueryBuilder = (tableName, rowNames, data) => {
   let insertQueryString = `INSERT INTO ${tableName} (`;
   const preparedArray = [];
   rowNames.forEach((name) => {
     insertQueryString += `${name}, `;
   });
-  insertQueryString = insertQueryString.slice(0, -2) + ') VALUES (';
+  // insertQueryString = insertQueryString.slice(0, -2) + ') VALUES (';
+  insertQueryString = `${insertQueryString.slice(0, -2)}) VALUES (`;
 
   const rowLength = rowNames.length;
 
   data.forEach((singleItem, index) => {
-    let singleItemIndex = 0;
-    for (const prop in singleItem) {
-      preparedArray.push(singleItem[prop]);
+    Object.keys(singleItem).forEach((key, singleItemIndex) => {
+      preparedArray.push(singleItem[key]);
       insertQueryString += `$${index * rowLength + singleItemIndex + 1}, `;
-      singleItemIndex++;
-    }
-    insertQueryString = insertQueryString.slice(0, -2) + '), (';
+    });
+
+    // insertQueryString = insertQueryString.slice(0, -2) + '), (';
+    insertQueryString = `${insertQueryString.slice(0, -2)}), (`;
   });
-  insertQueryString = insertQueryString.slice(0, -3) + ';';
+  // insertQueryString = insertQueryString.slice(0, -3) + ';';
+  insertQueryString = `${insertQueryString.slice(0, -3)};`;
 
   return {
     insertQueryString,
@@ -86,7 +91,7 @@ const isnertQueryBuilder = (tableName, rowNames, data) => {
 };
 
 const insertTracks = async (loadedTracks) => {
-  const { insertQueryString, preparedArray } = isnertQueryBuilder(
+  const { insertQueryString, preparedArray } = insertQueryBuilder(
     'tracks',
     ['album_id', 'name', 'id'],
     loadedTracks
@@ -98,7 +103,7 @@ const insertTracks = async (loadedTracks) => {
 
 // eslint-disable-next-line no-unused-vars
 const insertAlbums = async (loadedAlbums) => {
-  const { insertQueryString, preparedArray } = isnertQueryBuilder(
+  const { insertQueryString, preparedArray } = insertQueryBuilder(
     'albums',
     ['id', 'artist', 'name', 'big_picture', 'small_picture', 'link'],
     loadedAlbums
